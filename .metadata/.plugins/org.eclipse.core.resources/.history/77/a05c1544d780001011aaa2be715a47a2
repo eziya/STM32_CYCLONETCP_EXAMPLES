@@ -761,7 +761,7 @@
 // <q>BSD socket support
 // <i>Enable BSD socket support
 // <i>Default: Disabled
-#define BSD_SOCKET_SUPPORT 1
+#define BSD_SOCKET_SUPPORT 0
 
 // <q>Raw socket support
 // <i>Enable raw socket support

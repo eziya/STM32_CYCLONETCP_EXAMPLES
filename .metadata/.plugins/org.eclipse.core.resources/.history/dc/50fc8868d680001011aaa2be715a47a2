@@ -64,6 +64,8 @@
 extern UART_HandleTypeDef huart1;
 DhcpClientSettings dhcpClientSettings;
 DhcpClientContext dhcpClientContext;
+EchoServerSettings echoServerSettings;
+EchoServerContext echoServerContext;
 
 osThreadId_t echoTaskHandle;
 const osThreadAttr_t echoTask_attributes = {

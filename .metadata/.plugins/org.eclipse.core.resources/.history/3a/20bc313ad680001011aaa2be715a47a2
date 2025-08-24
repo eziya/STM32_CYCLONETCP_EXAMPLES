@@ -26,11 +26,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "core/net.h"
-#include "core/bsd_socket.h"
 #include "drivers/mac/stm32h7xx_eth_driver.h"
 #include "drivers/phy/lan8742_driver.h"
 #include "dhcp/dhcp_client.h"
 #include "debug.h"
+#include "echo_server.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,14 +64,8 @@
 extern UART_HandleTypeDef huart1;
 DhcpClientSettings dhcpClientSettings;
 DhcpClientContext dhcpClientContext;
-
-osThreadId_t echoTaskHandle;
-const osThreadAttr_t echoTask_attributes = {
-  .name = "echoTask",
-  .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-
+EchoServerSettings echoServerSettings;
+EchoServerContext echoServerContext;
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -84,9 +78,10 @@ const osThreadAttr_t defaultTask_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 void debugDisplayArray(FILE *stream, const char_t *prepend, const void *data, size_t length);
-void EchoServerTask(void *argument);
 /* USER CODE END FunctionPrototypes */
+
 void StartDefaultTask(void *argument);
+
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* Hook prototypes */
@@ -224,9 +219,20 @@ void StartDefaultTask(void *argument)
   ipv4StringToAddr(APP_IPV4_SECONDARY_DNS, &ipv4Addr);
   ipv4SetDnsServer(interface, 1, ipv4Addr);
 #endif
+/* Initialize Echo Server */
+  echoServerGetDefaultSettings(&echoServerSettings);
+  echoServerSettings.interface = &netInterface[0];
+  echoServerSettings.port = APP_ECHO_SERVER_PORT;
 
-  /* Start Echo Task */
-  echoTaskHandle = osThreadNew(EchoServerTask, NULL, &echoTask_attributes);
+  if(echoServerInit(&echoServerContext, &echoServerSettings))
+  {
+    TRACE_ERROR("Failed to initialize Echo server!\r\n");
+  }
+
+  if(echoServerStart(&echoServerContext))
+  {
+    TRACE_ERROR("Failed to start Echo server!\r\n");
+  }
 
   /* Infinite loop */
   for(;;)
@@ -239,88 +245,6 @@ void StartDefaultTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
-void EchoServerTask(void *argument)
-{
-  int listen_sock = SOCKET_ERROR, client_sock = SOCKET_ERROR;
-  struct sockaddr_in server_addr, client_addr;
-  socklen_t client_addr_len;
-  int optval = 1;
-  char buffer[512];
-  int n;
-
-  /* create socket */
-  listen_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if(listen_sock < 0)
-  {
-    TRACE_ERROR("Socket creation failed!\r\n");
-    vTaskDelete(NULL);
-  }
-
-  /* set SO_REUSEADDR */
-  setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
-
-  /* bind */
-  memset(&server_addr, 0, sizeof(server_addr));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(APP_ECHO_SERVER_PORT);
-  server_addr.sin_addr.s_addr = INADDR_ANY;
-
-  if(bind(listen_sock, (struct sockaddr*) &server_addr, sizeof(server_addr)) < 0)
-  {
-    TRACE_ERROR("Socket bind failed!\r\n");
-    closesocket(listen_sock);
-    vTaskDelete(NULL);
-  }
-
-  /* listen */
-  if(listen(listen_sock, 4) < 0)
-  {
-    TRACE_ERROR("Socket listen failed!\r\n");
-    closesocket(listen_sock);
-    vTaskDelete(NULL);
-  }
-
-  TRACE_INFO("Echo server (BSD socket) is listening on port %d\r\n", APP_ECHO_SERVER_PORT);
-
-  while(1)
-  {
-    /* accept */
-    client_addr_len = sizeof(client_addr);
-    client_sock = accept(listen_sock, (struct sockaddr*) &client_addr, &client_addr_len);
-    if(client_sock < 0)
-    {
-      osDelay(10);
-      continue;
-    }
-
-    TRACE_INFO("Client connected: %u.%u.%u.%u:%u\r\n", (unsigned int )(client_addr.sin_addr.s_addr & 0xFF),
-        (unsigned int )((client_addr.sin_addr.s_addr >> 8) & 0xFF), (unsigned int )((client_addr.sin_addr.s_addr >> 16) & 0xFF),
-        (unsigned int )((client_addr.sin_addr.s_addr >> 24) & 0xFF), ntohs(client_addr.sin_port));
-
-    /* receive message and send it back */
-    while(1)
-    {
-      n = recv(client_sock, buffer, sizeof(buffer), 0);
-      if(n <= 0)
-      {
-        TRACE_INFO("Client disconnected\r\n");
-        break;
-      }
-
-      send(client_sock, buffer, n, 0);
-    }
-    closesocket(client_sock);
-    client_sock = SOCKET_ERROR;
-  }
-}
-
-int __io_putchar (int ch)
-{
-  HAL_UART_Transmit(&huart1, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
-  return ch;
-}
-
 /**
  * @brief Display the contents of an array
  * @param[in] stream Pointer to a FILE object that identifies an output stream
@@ -328,6 +252,7 @@ int __io_putchar (int ch)
  * @param[in] data Pointer to the data array
  * @param[in] length Number of bytes to display
  **/
+
 void debugDisplayArray(FILE *stream, const char_t *prepend, const void *data, size_t length)
 {
    uint_t i;
@@ -343,6 +268,12 @@ void debugDisplayArray(FILE *stream, const char_t *prepend, const void *data, si
       if((i % 16) == 15 || i == (length - 1))
          fprintf(stream, "\r\n");
    }
+}
+
+int __io_putchar (int ch)
+{
+  HAL_UART_Transmit(&huart1, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
+  return ch;
 }
 
 /* USER CODE END Application */
