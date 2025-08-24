@@ -1,0 +1,32 @@
+//**********************************************************
+//* STM32N657 macro file (running code from internal SRAM) *
+//**********************************************************
+
+execUserPreload()
+{
+   //Debug message
+   __message "***********************";
+   __message "*** execUserPreload ***";
+   __message "***********************";
+}
+
+execUserReset()
+{
+   //Debug message
+   __message "**********************";
+   __message "*** execUserReset ****";
+   __message "**********************";
+
+   //Re-load image
+   __loadImage("$EXE_DIR$\\$TARGET_FNAME$", 0, 0);
+   __restoreSoftwareBreakpoints();
+
+   //Setup Vector Table Offset Register
+   __writeMemory32(0x34180400, 0xE000ED08, "Memory");
+
+   //Setup stack pointer
+   #SP = __readMemory32(0x34180400, "Memory");
+
+   //Setup program counter
+   #PC= __readMemory32(0x34180404, "Memory");
+}

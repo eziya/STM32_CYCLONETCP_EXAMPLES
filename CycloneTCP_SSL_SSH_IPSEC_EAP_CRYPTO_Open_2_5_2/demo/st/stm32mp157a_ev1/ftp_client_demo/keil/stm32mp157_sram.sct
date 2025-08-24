@@ -1,0 +1,34 @@
+;********************************************************************
+;* STM32MP157 linker scatter file (running code from internal SRAM) *
+;********************************************************************
+
+LR_VECTORS 0x00000000 0x10000
+{
+   .isr_vector +0
+   {
+      startup*.o (RESET, +First)
+      *(InRoot$$Sections)
+   }
+}
+
+LR_IROM1 0x10000000 0x60000
+{
+   ER_IROM1 0x10000000 0x30000
+   {
+      .ANY (+RO)
+      .ANY (+XO)
+   }
+   
+   RW_IRAM1 0x10030000 0xFC00
+   {
+      .ANY (+RW +ZI)
+   }
+   
+   ARM_LIB_STACK 0x10040000 EMPTY -0x400
+   {
+   }
+   
+   ARM_LIB_HEAP 0x10040000 EMPTY 0x20000
+   {
+   }
+}
