@@ -36,7 +36,6 @@ Middlewares/CycloneTCP/CycloneTCP/DHCP/DHCP\ Client \
 Middlewares/CycloneTCP/CycloneTCP/DNS/DNS\ Client \
 Middlewares/CycloneTCP/CycloneTCP/Drivers\ (MAC)/STM32H7xx \
 Middlewares/CycloneTCP/CycloneTCP/Drivers\ (PHY)/LAN8742 \
-Middlewares/CycloneTCP/CycloneTCP/Echo/Echo\ Server \
 Middlewares/CycloneTCP/CycloneTCP/IPv4/Auto-IP \
 Middlewares/CycloneTCP/CycloneTCP/IPv4/Core \
 Middlewares/CycloneTCP/CycloneTCP/IPv4/NAT \

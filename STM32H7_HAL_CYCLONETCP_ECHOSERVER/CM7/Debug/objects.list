@@ -56,8 +56,6 @@
 "./Middlewares/CycloneTCP/CycloneTCP/DNS/DNS Client/dns_debug.o"
 "./Middlewares/CycloneTCP/CycloneTCP/Drivers (MAC)/STM32H7xx/stm32h7xx_eth_driver.o"
 "./Middlewares/CycloneTCP/CycloneTCP/Drivers (PHY)/LAN8742/lan8742_driver.o"
-"./Middlewares/CycloneTCP/CycloneTCP/Echo/Echo Server/echo_server.o"
-"./Middlewares/CycloneTCP/CycloneTCP/Echo/Echo Server/echo_server_misc.o"
 "./Middlewares/CycloneTCP/CycloneTCP/IPv4/Auto-IP/auto_ip.o"
 "./Middlewares/CycloneTCP/CycloneTCP/IPv4/Auto-IP/auto_ip_misc.o"
 "./Middlewares/CycloneTCP/CycloneTCP/IPv4/Core/arp.o"

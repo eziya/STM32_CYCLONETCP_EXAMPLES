@@ -918,8 +918,6 @@ error_t natParseTransportHeader(NatIpPacket *packet)
    error_t error;
    size_t length;
 
-   (void)length;
-
    //Initialize status code
    error = NO_ERROR;
 

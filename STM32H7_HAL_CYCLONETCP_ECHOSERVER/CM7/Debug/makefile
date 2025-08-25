@@ -18,7 +18,6 @@ RM := rm -rf
 -include Middlewares/CycloneTCP/CycloneTCP/IPv4/NAT/subdir.mk
 -include Middlewares/CycloneTCP/CycloneTCP/IPv4/Core/subdir.mk
 -include Middlewares/CycloneTCP/CycloneTCP/IPv4/Auto-IP/subdir.mk
--include Middlewares/CycloneTCP/CycloneTCP/Echo/Echo\ Server/subdir.mk
 -include Middlewares/CycloneTCP/CycloneTCP/Drivers\ (PHY)/LAN8742/subdir.mk
 -include Middlewares/CycloneTCP/CycloneTCP/Drivers\ (MAC)/STM32H7xx/subdir.mk
 -include Middlewares/CycloneTCP/CycloneTCP/DNS/DNS\ Client/subdir.mk

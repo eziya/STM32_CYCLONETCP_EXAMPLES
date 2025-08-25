@@ -246,7 +246,7 @@
 // <4=>Info
 // <5=>Debug
 // <6=>Verbose
-#define TCP_TRACE_LEVEL 5
+#define TCP_TRACE_LEVEL 0
 
 // <o>Socket Trace level
 // <i>Set the desired debugging level
@@ -330,7 +330,7 @@
 // <4=>Info
 // <5=>Debug
 // <6=>Verbose
-#define DHCP_TRACE_LEVEL 5
+#define DHCP_TRACE_LEVEL 0
 
 // <o>DHCPv6 Trace level
 // <i>Set the desired debugging level

@@ -370,16 +370,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/Oryx-Embedded_CycloneTCP_CycloneTCP/cyclone_tcp/drivers/phy/lan8742_driver.c</locationURI>
 		</link>
 		<link>
-			<name>Middlewares/CycloneTCP/CycloneTCP/Echo/Echo Server/echo_server.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/Oryx-Embedded_CycloneTCP_CycloneTCP/cyclone_tcp/echo/echo_server.c</locationURI>
-		</link>
-		<link>
-			<name>Middlewares/CycloneTCP/CycloneTCP/Echo/Echo Server/echo_server_misc.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/Oryx-Embedded_CycloneTCP_CycloneTCP/cyclone_tcp/echo/echo_server_misc.c</locationURI>
-		</link>
-		<link>
 			<name>Middlewares/CycloneTCP/CycloneTCP/IPv4/Auto-IP/auto_ip.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/Oryx-Embedded_CycloneTCP_CycloneTCP/cyclone_tcp/ipv4/auto_ip.c</locationURI>

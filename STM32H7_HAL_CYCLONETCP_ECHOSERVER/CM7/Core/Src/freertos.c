@@ -86,7 +86,9 @@ const osThreadAttr_t defaultTask_attributes = {
 void debugDisplayArray(FILE *stream, const char_t *prepend, const void *data, size_t length);
 void EchoServerTask(void *argument);
 /* USER CODE END FunctionPrototypes */
+
 void StartDefaultTask(void *argument);
+
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /* Hook prototypes */
@@ -170,12 +172,11 @@ void StartDefaultTask(void *argument)
   TRACE_INFO("***********************************\r\n");
   TRACE_INFO("*** CycloneTCP Echo Server Demo ***\r\n");
   TRACE_INFO("***********************************\r\n");
-  TRACE_INFO("Copyright: 2010-2025 Oryx Embedded SARL\r\n");
-  TRACE_INFO("Compiled: %s %s\r\n", __DATE__, __TIME__);
-  TRACE_INFO("Target: STM32H747XI\r\n");
+  TRACE_INFO("Target: STM32H747-DISCO\r\n");
   TRACE_INFO("\r\n");
 
   /* Initialize stack */
+  TRACE_INFO("Initialize TCP/IP stack.\r\n");
   if(netInit())
   {
     TRACE_ERROR("Failed to initialize TCP/IP stack!\r\n");
@@ -190,9 +191,10 @@ void StartDefaultTask(void *argument)
   netSetDriver(interface, &stm32h7xxEthDriver);
   netSetPhyDriver(interface, &lan8742PhyDriver);
 
+  TRACE_INFO("Initialize interface.\r\n");
   if(netConfigInterface(interface))
   {
-    TRACE_ERROR("Failed to configure interface %s!\r\n", interface->name);
+    TRACE_ERROR("Failed to initialize interface %s!\r\n", interface->name);
   }
 
 #if (APP_USE_DHCP_CLIENT == ENABLED)
@@ -201,17 +203,20 @@ void StartDefaultTask(void *argument)
   dhcpClientSettings.interface = interface;
   dhcpClientSettings.rapidCommit = FALSE;
 
+  TRACE_INFO("Initialize DHCP client.\r\n");
   if(dhcpClientInit(&dhcpClientContext, &dhcpClientSettings))
   {
     TRACE_ERROR("Failed to initialize DHCP client!\r\n");
   }
 
+  TRACE_INFO("Start DHCP client.\r\n");
   if(dhcpClientStart(&dhcpClientContext))
   {
     TRACE_ERROR("Failed to start DHCP client!\r\n");
   }
 #else
   /* Configure static ip address */
+  TRACE_INFO("Configure static IP address.\r\n");
   Ipv4Addr ipv4Addr;
   ipv4StringToAddr(APP_IPV4_HOST_ADDR, &ipv4Addr);
   ipv4SetHostAddr(interface, ipv4Addr);
@@ -226,6 +231,7 @@ void StartDefaultTask(void *argument)
 #endif
 
   /* Start Echo Task */
+  TRACE_INFO("Start Echo Task.\r\n");
   echoTaskHandle = osThreadNew(EchoServerTask, NULL, &echoTask_attributes);
 
   /* Infinite loop */
@@ -315,6 +321,7 @@ void EchoServerTask(void *argument)
   }
 }
 
+
 int __io_putchar (int ch)
 {
   HAL_UART_Transmit(&huart1, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
@@ -336,12 +343,16 @@ void debugDisplayArray(FILE *stream, const char_t *prepend, const void *data, si
    {
       //Beginning of a new line?
       if((i % 16) == 0)
+      {
          fprintf(stream, "%s", prepend);
+      }
       //Display current data byte
       fprintf(stream, "%02" PRIX8 " ", *((uint8_t *) data + i));
       //End of current line?
       if((i % 16) == 15 || i == (length - 1))
+      {
          fprintf(stream, "\r\n");
+      }
    }
 }
 
