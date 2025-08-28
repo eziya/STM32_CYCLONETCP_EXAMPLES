@@ -3056,3 +3056,6 @@ This warning can be switched off on the Team > Git > Confirmations and Warnings 
 
 !ENTRY org.eclipse.cdt.core 1 0 2025-08-28 21:17:38.497
 !MESSAGE Indexed 'STM32H7_HAL_CYCLONETCP_FTPCLIENT_CM7' (96 sources, 224 headers) in 5.62 sec: 25,526 declarations; 152,899 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0011%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2025-08-28 22:01:01.842
+!MESSAGE Indexed 'STM32H7_HAL_CYCLONETCP_FTPCLIENT_CM7' (97 sources, 224 headers) in 4.59 sec: 25,595 declarations; 153,490 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.0011%)

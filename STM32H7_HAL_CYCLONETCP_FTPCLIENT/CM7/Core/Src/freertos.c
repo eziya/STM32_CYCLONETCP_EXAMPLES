@@ -173,80 +173,80 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN StartDefaultTask */
 
   NetInterface *interface;
-    MacAddr macAddr;
+  MacAddr macAddr;
 
-    //Start-up message
-    TRACE_INFO("\r\n");
-    TRACE_INFO("***********************************\r\n");
-    TRACE_INFO("*** CycloneTCP Echo Server Demo ***\r\n");
-    TRACE_INFO("***********************************\r\n");
-    TRACE_INFO("Target: STM32H747I-DISCO\r\n");
-    TRACE_INFO("\r\n");
+  //Start-up message
+  TRACE_INFO("\r\n");
+  TRACE_INFO("***********************************\r\n");
+  TRACE_INFO("*** CycloneTCP Echo Server Demo ***\r\n");
+  TRACE_INFO("***********************************\r\n");
+  TRACE_INFO("Target: STM32H747I-DISCO\r\n");
+  TRACE_INFO("\r\n");
 
-    /* Initialize stack */
-    TRACE_INFO("Initialize TCP/IP stack.\r\n");
-    if(netInit())
-    {
-      TRACE_ERROR("Failed to initialize TCP/IP stack!\r\n");
-    }
+  /* Initialize stack */
+  TRACE_INFO("Initialize TCP/IP stack.\r\n");
+  if(netInit())
+  {
+    TRACE_ERROR("Failed to initialize TCP/IP stack!\r\n");
+  }
 
-    /* Initialize Layer1 & Layer2 */
-    interface = &netInterface[0];
-    netSetInterfaceName(interface, APP_IF_NAME);
-    netSetHostname(interface, APP_HOST_NAME);
-    macStringToAddr(APP_MAC_ADDR, &macAddr);
-    netSetMacAddr(interface, &macAddr);
-    netSetDriver(interface, &stm32h7xxEthDriver);
-    netSetPhyDriver(interface, &lan8742PhyDriver);
+  /* Initialize Layer1 & Layer2 */
+  interface = &netInterface[0];
+  netSetInterfaceName(interface, APP_IF_NAME);
+  netSetHostname(interface, APP_HOST_NAME);
+  macStringToAddr(APP_MAC_ADDR, &macAddr);
+  netSetMacAddr(interface, &macAddr);
+  netSetDriver(interface, &stm32h7xxEthDriver);
+  netSetPhyDriver(interface, &lan8742PhyDriver);
 
-    TRACE_INFO("Initialize interface.\r\n");
-    if(netConfigInterface(interface))
-    {
-      TRACE_ERROR("Failed to initialize interface %s!\r\n", interface->name);
-    }
+  TRACE_INFO("Initialize interface.\r\n");
+  if(netConfigInterface(interface))
+  {
+    TRACE_ERROR("Failed to initialize interface %s!\r\n", interface->name);
+  }
 
-  #if (APP_USE_DHCP_CLIENT == ENABLED)
-    /* Initialize DHCP */
-    dhcpClientGetDefaultSettings(&dhcpClientSettings);
-    dhcpClientSettings.interface = interface;
-    dhcpClientSettings.rapidCommit = FALSE;
+#if (APP_USE_DHCP_CLIENT == ENABLED)
+  /* Initialize DHCP */
+  dhcpClientGetDefaultSettings(&dhcpClientSettings);
+  dhcpClientSettings.interface = interface;
+  dhcpClientSettings.rapidCommit = FALSE;
 
-    TRACE_INFO("Initialize DHCP client.\r\n");
-    if(dhcpClientInit(&dhcpClientContext, &dhcpClientSettings))
-    {
-      TRACE_ERROR("Failed to initialize DHCP client!\r\n");
-    }
+  TRACE_INFO("Initialize DHCP client.\r\n");
+  if(dhcpClientInit(&dhcpClientContext, &dhcpClientSettings))
+  {
+    TRACE_ERROR("Failed to initialize DHCP client!\r\n");
+  }
 
-    TRACE_INFO("Start DHCP client.\r\n");
-    if(dhcpClientStart(&dhcpClientContext))
-    {
-      TRACE_ERROR("Failed to start DHCP client!\r\n");
-    }
-  #else
-    /* Configure static ip address */
-    TRACE_INFO("Configure static IP address.\r\n");
-    Ipv4Addr ipv4Addr;
-    ipv4StringToAddr(APP_IPV4_HOST_ADDR, &ipv4Addr);
-    ipv4SetHostAddr(interface, ipv4Addr);
-    ipv4StringToAddr(APP_IPV4_SUBNET_MASK, &ipv4Addr);
-    ipv4SetSubnetMask(interface, ipv4Addr);
-    ipv4StringToAddr(APP_IPV4_DEFAULT_GATEWAY, &ipv4Addr);
-    ipv4SetDefaultGateway(interface, ipv4Addr);
-    ipv4StringToAddr(APP_IPV4_PRIMARY_DNS, &ipv4Addr);
-    ipv4SetDnsServer(interface, 0, ipv4Addr);
-    ipv4StringToAddr(APP_IPV4_SECONDARY_DNS, &ipv4Addr);
-    ipv4SetDnsServer(interface, 1, ipv4Addr);
-  #endif
+  TRACE_INFO("Start DHCP client.\r\n");
+  if(dhcpClientStart(&dhcpClientContext))
+  {
+    TRACE_ERROR("Failed to start DHCP client!\r\n");
+  }
+#else
+  /* Configure static ip address */
+  TRACE_INFO("Configure static IP address.\r\n");
+  Ipv4Addr ipv4Addr;
+  ipv4StringToAddr(APP_IPV4_HOST_ADDR, &ipv4Addr);
+  ipv4SetHostAddr(interface, ipv4Addr);
+  ipv4StringToAddr(APP_IPV4_SUBNET_MASK, &ipv4Addr);
+  ipv4SetSubnetMask(interface, ipv4Addr);
+  ipv4StringToAddr(APP_IPV4_DEFAULT_GATEWAY, &ipv4Addr);
+  ipv4SetDefaultGateway(interface, ipv4Addr);
+  ipv4StringToAddr(APP_IPV4_PRIMARY_DNS, &ipv4Addr);
+  ipv4SetDnsServer(interface, 0, ipv4Addr);
+  ipv4StringToAddr(APP_IPV4_SECONDARY_DNS, &ipv4Addr);
+  ipv4SetDnsServer(interface, 1, ipv4Addr);
+#endif
 
-    Ipv4Addr ipv4Addr;
-    ipv4StringToAddr(APP_IPV4_PRIMARY_DNS, &ipv4Addr);
-    ipv4SetDnsServer(interface, 0, ipv4Addr);
-    ipv4StringToAddr(APP_IPV4_SECONDARY_DNS, &ipv4Addr);
-    ipv4SetDnsServer(interface, 1, ipv4Addr);
+  Ipv4Addr ipv4Addr;
+  ipv4StringToAddr(APP_IPV4_PRIMARY_DNS, &ipv4Addr);
+  ipv4SetDnsServer(interface, 0, ipv4Addr);
+  ipv4StringToAddr(APP_IPV4_SECONDARY_DNS, &ipv4Addr);
+  ipv4SetDnsServer(interface, 1, ipv4Addr);
 
-    /* Start FTP Task */
-    TRACE_INFO("Start FTP Task.\r\n");
-    ftpTaskHandle = osThreadNew(FtpClientTask, NULL, &ftpTask_attributes);
+  /* Start FTP Task */
+  TRACE_INFO("Start FTP Task.\r\n");
+  ftpTaskHandle = osThreadNew(FtpClientTask, NULL, &ftpTask_attributes);
 
   /* Infinite loop */
   for(;;)
