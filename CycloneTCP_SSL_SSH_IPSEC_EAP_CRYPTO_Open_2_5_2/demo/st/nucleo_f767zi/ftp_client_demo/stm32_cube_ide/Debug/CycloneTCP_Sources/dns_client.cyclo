@@ -1,0 +1,4 @@
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/dns/dns_client.c:218:9:dnsSendQuery	10
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/dns/dns_client.c:54:9:dnsResolve	9
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/dns/dns_client.c:589:6:dnsSelectNextServer	2
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/dns/dns_client.c:383:6:dnsProcessResponse	32

@@ -1,0 +1,12 @@
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:63:9:udpInit	8	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:81:10:udpGetDynamicPort	8	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:658:9:udpSendBuffer	96	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:948:12:udpAllocBuffer	8	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:517:9:udpSendDatagram	88	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:971:6:udpUpdateEvents	8	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:843:9:udpReceiveDatagram	24	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:1021:9:udpAttachRxCallback	8	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:1062:9:udpDetachRxCallback	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:1108:9:udpInvokeRxCallback	48	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:124:9:udpProcessDatagram	96	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/udp.c:1171:6:udpDumpHeader	0	static

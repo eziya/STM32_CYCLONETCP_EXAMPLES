@@ -158,4 +158,6 @@
 //FTP client support
 #define FTP_CLIENT_SUPPORT ENABLED
 
+#define BSD_SOCKET_SUPPORT 1
+
 #endif

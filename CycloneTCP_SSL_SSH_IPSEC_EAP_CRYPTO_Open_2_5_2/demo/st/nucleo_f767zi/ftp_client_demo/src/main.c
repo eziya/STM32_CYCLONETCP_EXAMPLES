@@ -38,6 +38,7 @@
 #include "ipv6/slaac.h"
 #include "ftp/ftp_client.h"
 #include "debug.h"
+#include "core/bsd_socket.h"
 
 //Ethernet interface configuration
 #define APP_IF_NAME "eth0"

@@ -1,0 +1,12 @@
+../syscalls.c:23:5:_write	5
+../syscalls.c:41:5:_read	1
+../syscalls.c:46:16:_sbrk	3
+../syscalls.c:67:12:link	1
+../syscalls.c:72:12:_close	1
+../syscalls.c:77:12:_fstat	1
+../syscalls.c:83:12:_isatty	1
+../syscalls.c:88:12:_lseek	1
+../syscalls.c:93:13:_exit	1
+../syscalls.c:98:13:_kill	1
+../syscalls.c:103:12:_getpid	1
+../syscalls.c:108:5:AllowPLLInitByStartup	1

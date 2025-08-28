@@ -1,0 +1,11 @@
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:53:15:nicGetLogicalInterface	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:85:15:nicGetPhysicalInterface	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:114:9:nicGetSwitchPort	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:145:10:nicGetVlanId	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:176:10:nicGetVmanId	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:208:8:nicIsParentInterface	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:251:6:nicTick	8	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:281:9:nicSendPacket	24	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:353:9:nicUpdateMacAddrFilter	16	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:392:6:nicProcessPacket	40	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/cyclone_tcp/core/nic.c:559:6:nicNotifyLinkChange	24	static

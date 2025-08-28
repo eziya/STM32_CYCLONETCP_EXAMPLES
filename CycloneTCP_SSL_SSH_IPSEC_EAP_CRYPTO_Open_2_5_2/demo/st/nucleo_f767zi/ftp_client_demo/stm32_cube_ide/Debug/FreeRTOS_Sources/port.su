@@ -1,0 +1,12 @@
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:215:13:prvTaskExitError	8	static,ignoring_inline_asm
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:260:13:prvPortStartFirstTask	0	static,ignoring_inline_asm
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:702:13:vPortEnableVFP	0	static,ignoring_inline_asm
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:183:15:pxPortInitialiseStack	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:241:6:SVC_Handler	0	static,ignoring_inline_asm
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:390:6:vPortEndScheduler	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:398:6:vPortEnterCritical	0	static,ignoring_inline_asm
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:415:6:vPortExitCritical	0	static,ignoring_inline_asm
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:427:6:PendSV_Handler	0	static,ignoring_inline_asm
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:486:6:xPortSysTickHandler	8	static,ignoring_inline_asm
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:680:32:vPortSetupTimerInterrupt	0	static
+G:/WorkSpace/STM32/STM32_CYCLONETCP_EXAMPLES/CycloneTCP_SSL_SSH_IPSEC_EAP_CRYPTO_Open_2_5_2/third_party/freertos/portable/gcc/arm_cm7/r0p1/port.c:287:12:xPortStartScheduler	16	static
