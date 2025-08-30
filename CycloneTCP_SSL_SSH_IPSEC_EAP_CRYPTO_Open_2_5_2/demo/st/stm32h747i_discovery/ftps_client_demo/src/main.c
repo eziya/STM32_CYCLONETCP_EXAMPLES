@@ -78,8 +78,8 @@
 #define APP_FTP_PASSWORD "password"
 #define APP_FTP_FILENAME "readme.txt"
 
-#define APP_SET_CIPHER_SUITES DISABLED
-#define APP_SET_SERVER_NAME DISABLED
+#define APP_SET_CIPHER_SUITES ENABLED
+#define APP_SET_SERVER_NAME ENABLED
 #define APP_SET_TRUSTED_CA_LIST DISABLED
 
 //List of preferred ciphersuites
@@ -797,7 +797,7 @@ int_t main(void)
 
    //Set task parameters
    taskParams = OS_TASK_DEFAULT_PARAMS;
-   taskParams.stackSize = 750;
+   taskParams.stackSize = 2048;
    taskParams.priority = OS_TASK_PRIORITY_NORMAL;
 
    //Create user task

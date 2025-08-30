@@ -7,3 +7,5 @@ org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:STM32H7_HAL_CYCLONETCP_ECHOSERV
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:STM32H7_HAL_CYCLONETCP_ECHOSERVER_CM7/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:STM32H7_HAL_CYCLONETCP_FTPCLIENT_CM7\ Debug/activeLaunchMode=run
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:STM32H7_HAL_CYCLONETCP_FTPCLIENT_CM7\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:STM32H7_HAL_CYCLONETCP_SFTPCLIENT_CM7/activeLaunchMode=debug
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:ftps_client_demo/activeLaunchMode=debug

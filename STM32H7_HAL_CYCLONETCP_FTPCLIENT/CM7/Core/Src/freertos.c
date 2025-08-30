@@ -178,7 +178,7 @@ void StartDefaultTask(void *argument)
   //Start-up message
   TRACE_INFO("\r\n");
   TRACE_INFO("***********************************\r\n");
-  TRACE_INFO("*** CycloneTCP Echo Server Demo ***\r\n");
+  TRACE_INFO("*** CycloneTCP FTP Client Demo ***\r\n");
   TRACE_INFO("***********************************\r\n");
   TRACE_INFO("Target: STM32H747I-DISCO\r\n");
   TRACE_INFO("\r\n");
