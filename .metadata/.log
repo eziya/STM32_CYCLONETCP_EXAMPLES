@@ -5731,3 +5731,53 @@ java.lang.Exception: Resource '/STM32H7_HAL_CYCLONETCP_SFTPCLIENT_CM7/Debug/Midd
 
 !ENTRY org.eclipse.cdt.core 1 0 2025-08-30 22:26:55.905
 !MESSAGE Indexed 'STM32H7_HAL_CYCLONETCP_SFTPCLIENT_CM7' (173 sources, 320 headers) in 6.42 sec: 34,700 declarations; 213,307 references; 0 unresolved inclusions; 1 syntax errors; 2 unresolved names (0.00081%)
+!SESSION 2025-08-30 23:59:51.545 -----------------------------------------------
+eclipse.buildId=Version 1.19.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=ko_KR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-08-31 00:00:02.338
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-08-31 00:00:02.343
+!MESSAGE Log4j2 initialized with config file G:\WorkSpace\STM32\STM32_CYCLONETCP_EXAMPLES\.metadata\.log4j2.xml
+
+!ENTRY org.eclipse.egit.ui 2 0 2025-08-31 00:00:04.903
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\jihoo'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-08-31 00:00:07.047
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY com.genuitec.eclipse.codetogether.ui 1 0 2025-08-31 00:00:17.515
+!MESSAGE No proxy data found for url: https://live.codetogether.io/ct-url
+!SESSION 2025-08-31 09:48:46.363 -----------------------------------------------
+eclipse.buildId=Version 1.19.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=ko_KR
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-08-31 09:49:08.452
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-08-31 09:49:08.483
+!MESSAGE Log4j2 initialized with config file G:\WorkSpace\STM32\STM32_CYCLONETCP_EXAMPLES\.metadata\.log4j2.xml
+
+!ENTRY org.eclipse.egit.ui 2 0 2025-08-31 09:49:12.889
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\jihoo'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-08-31 09:49:36.687
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY com.genuitec.eclipse.codetogether.ui 1 0 2025-08-31 09:49:46.656
+!MESSAGE No proxy data found for url: https://live.codetogether.io/ct-url
