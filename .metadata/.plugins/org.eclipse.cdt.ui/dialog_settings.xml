@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<item key="org.eclipse.cdt.ui.codeformatter.savepath.loadpath" value="G:\WorkSpace\STM32"/>
-	<item key="org.eclipse.cdt.utils.ui.controls.FileListControl" value="_WINSOCK_H"/>
+	<item key="org.eclipse.cdt.utils.ui.controls.FileListControl" value="RTE_RTOS_FreeRTOS_CORE"/>
 	<section name="completion_proposal_size">
 	</section>
 	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration">
