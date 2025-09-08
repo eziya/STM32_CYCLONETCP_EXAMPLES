@@ -7,11 +7,12 @@
 		<item value="APP_IPV4_PRIMARY_DNS"/>
 	</list>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="APP_SET_TRUSTED_CA_LIST"/>
+		<item key="selection" value="DHCP"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="DHCP"/>
 			<item value="APP_SET_TRUSTED_CA_LIST"/>
 			<item value="=  "/>
 			<item value="tlsInitHandshake"/>
@@ -19,7 +20,6 @@
 			<item value="TLS_MAX_VERSION"/>
 			<item value="X509_SUPPORT"/>
 			<item value="a"/>
-			<item value="RTE_CYCLONE_CRYPTO_ASN1"/>
 		</list>
 		<list key="replacehistory">
 			<item value="= "/>
