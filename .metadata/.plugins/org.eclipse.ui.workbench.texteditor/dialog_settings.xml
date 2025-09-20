@@ -7,11 +7,12 @@
 		<item value="APP_IPV4_PRIMARY_DNS"/>
 	</list>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="mqttClientPublishCallback"/>
+		<item key="selection" value="LED3"/>
 		<item key="casesensitive" value="true"/>
 		<item key="wholeword" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="LD1"/>
 			<item value="mqttTestPublishCallback"/>
 			<item value="MQTT_TOPIC_LED_3"/>
 			<item value="mqttConnected"/>
@@ -19,9 +20,9 @@
 			<item value="currentState"/>
 			<item value="APP_SERVER_PORT"/>
 			<item value="handleStateConnected"/>
-			<item value="handle_state_connected"/>
 		</list>
 		<list key="replacehistory">
+			<item value="LED1"/>
 			<item value="mqttClientPublishCallback"/>
 			<item value="btnState"/>
 			<item value="mqttState"/>
