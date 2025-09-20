@@ -47,8 +47,26 @@ typedef enum
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define APP_SERVER_NAME "test.mosquitto.org"
-//#define APP_SERVER_PORT 8883 //MQTT over TLS
-#define APP_SERVER_PORT 8884 //MQTT over TLS (mutual authentication)
+#define APP_SERVER_PORT 8883 //MQTT over TLS
+
+#define APP_SET_CIPHER_SUITES ENABLED
+#define APP_SET_SERVER_NAME ENABLED
+#define APP_SET_TRUSTED_CA_LIST ENABLED
+
+#define MQTT_TOPIC_BUTTON       "board/buttons/1"
+#define MQTT_TOPIC_STATUS       "board/status"
+#define MQTT_TOPIC_LEDS_WILD    "board/leds/+"
+#define MQTT_TOPIC_LED_3        "board/leds/3"
+
+#define MQTT_PAYLOAD_PRESSED    "pressed"
+#define MQTT_PAYLOAD_RELEASED   "released"
+#define MQTT_PAYLOAD_ONLINE     "online"
+#define MQTT_PAYLOAD_OFFLINE    "offline"
+#define MQTT_PAYLOAD_TOGGLE     "toggle"
+#define MQTT_PAYLOAD_ON         "on"
+
+#define DEFAULT_TASK_LOOP_DELAY_MS 100
+#define LED_TOGGLE_INTERVAL_MS     500
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,66 +76,57 @@ typedef enum
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+volatile uint_t g_btnState = 0;
+
 extern UART_HandleTypeDef huart1;
 extern HmacDrbgContext hmacDrbgContext;
 
-const char_t clientCert[] =
-{ "-----BEGIN CERTIFICATE-----"
-    "MIICmzCCAYOgAwIBAgIBADANBgkqhkiG9w0BAQsFADCBkDELMAkGA1UEBhMCR0Ix"
-    "FzAVBgNVBAgMDlVuaXRlZCBLaW5nZG9tMQ4wDAYDVQQHDAVEZXJieTESMBAGA1UE"
-    "CgwJTW9zcXVpdHRvMQswCQYDVQQLDAJDQTEWMBQGA1UEAwwNbW9zcXVpdHRvLm9y"
-    "ZzEfMB0GCSqGSIb3DQEJARYQcm9nZXJAYXRjaG9vLm9yZzAeFw0yNDA1MjAxMjIw"
-    "MTJaFw0yNDA4MTgxMjIwMTJaMEAxCzAJBgNVBAYTAkZSMRYwFAYDVQQKDA1Pcnl4"
-    "IEVtYmVkZGVkMRkwFwYDVQQDDBBtcXR0LWNsaWVudC1kZW1vMFkwEwYHKoZIzj0C"
-    "AQYIKoZIzj0DAQcDQgAEWT/enOkLuY+9NzUQPOuNVFARl5Y3bc4lLt3TyVwWG0Ez"
-    "IIk8Wll5Ljjrv+buPSKBVQtOwF9VgyW4QuQ1uYSAIaMaMBgwCQYDVR0TBAIwADAL"
-    "BgNVHQ8EBAMCBeAwDQYJKoZIhvcNAQELBQADggEBALW6YSU2jqs7TegW2CoydK7W"
-    "rEzy/8ecasdeDy+8vIkxC1chtm2VgYsndFUaLhSD31I0paLqE67kGzyD8TKhBAyp"
-    "4trhLsgFUjTsKYj8kPj147am2wwP0hbd1dygr+kaNxV3glZqot8IK2+topA3BbFO"
-    "34wvdNI81o63ldKn+Q3sp522osxfwiCy8/5DZ+2VLzGBwbsKaYNk2RwhUNbF88eD"
-    "IHAi9iY3YYx7hE9UvMA3CbWBOmz06lFWr2Nwyr3lYM6qO87GKKMZaFjdrFtzQlaB"
-    "ngH1f6yCuM0iwd7gbWKwPWoilIDdg8DVi38fN/Clv5PbTt+KJslVbNElV6ykbyA="
-    "-----END CERTIFICATE-----" };
-
-const char_t clientKey[] =
-{ "-----BEGIN EC PRIVATE KEY-----"
-    "MHcCAQEEICYULY0KQ6nDAXFl5tgK9ljqAZyb14JQmI3iT7tdScDloAoGCCqGSM49"
-    "AwEHoUQDQgAEWT/enOkLuY+9NzUQPOuNVFARl5Y3bc4lLt3TyVwWG0EzIIk8Wll5"
-    "Ljjrv+buPSKBVQtOwF9VgyW4QuQ1uYSAIQ=="
-    "-----END EC PRIVATE KEY-----" };
+const uint16_t cipherSuites[] =
+{
+    // TLS 1.3 Suites
+    TLS_CHACHA20_POLY1305_SHA256,
+    TLS_AES_256_GCM_SHA384,
+    TLS_AES_128_GCM_SHA256,
+    // TLS 1.2 Suites
+    TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+    TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+    TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+    TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+};
 
 const char trustedCaList[] =
 { "-----BEGIN CERTIFICATE-----"
-    "MIID7zCCAtegAwIBAgIBADANBgkqhkiG9w0BAQsFADCBmDELMAkGA1UEBhMCVVMx"
-    "EDAOBgNVBAgTB0FyaXpvbmExEzARBgNVBAcTClNjb3R0c2RhbGUxJTAjBgNVBAoT"
-    "HFN0YXJmaWVsZCBUZWNobm9sb2dpZXMsIEluYy4xOzA5BgNVBAMTMlN0YXJmaWVs"
-    "ZCBTZXJ2aWNlcyBSb290IENlcnRpZmljYXRlIEF1dGhvcml0eSAtIEcyMB4XDTA5"
-    "MDkwMTAwMDAwMFoXDTM3MTIzMTIzNTk1OVowgZgxCzAJBgNVBAYTAlVTMRAwDgYD"
-    "VQQIEwdBcml6b25hMRMwEQYDVQQHEwpTY290dHNkYWxlMSUwIwYDVQQKExxTdGFy"
-    "ZmllbGQgVGVjaG5vbG9naWVzLCBJbmMuMTswOQYDVQQDEzJTdGFyZmllbGQgU2Vy"
-    "dmljZXMgUm9vdCBDZXJ0aWZpY2F0ZSBBdXRob3JpdHkgLSBHMjCCASIwDQYJKoZI"
-    "hvcNAQEBBQADggEPADCCAQoCggEBANUMOsQq+U7i9b4Zl1+OiFOxHz/Lz58gE20p"
-    "OsgPfTz3a3Y4Y9k2YKibXlwAgLIvWX/2h/klQ4bnaRtSmpDhcePYLQ1Ob/bISdm2"
-    "8xpWriu2dBTrz/sm4xq6HZYuajtYlIlHVv8loJNwU4PahHQUw2eeBGg6345AWh1K"
-    "Ts9DkTvnVtYAcMtS7nt9rjrnvDH5RfbCYM8TWQIrgMw0R9+53pBlbQLPLJGmpufe"
-    "hRhJfGZOozptqbXuNC66DQO4M99H67FrjSXZm86B0UVGMpZwh94CDklDhbZsc7tk"
-    "6mFBrMnUVN+HL8cisibMn1lUaJ/8viovxFUcdUBgF4UCVTmLfwUCAwEAAaNCMEAw"
-    "DwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFJxfAN+q"
-    "AdcwKziIorhtSpzyEZGDMA0GCSqGSIb3DQEBCwUAA4IBAQBLNqaEd2ndOxmfZyMI"
-    "bw5hyf2E3F/YNoHN2BtBLZ9g3ccaaNnRbobhiCPPE95Dz+I0swSdHynVv/heyNXB"
-    "ve6SbzJ08pGCL72CQnqtKrcgfU28elUSwhXqvfdqlS5sdJ/PHLTyxQGjhdByPq1z"
-    "qwubdQxtRbeOlKyWN7Wg0I8VRw7j6IPdj/3vQQF3zCepYoUz8jcI73HPdwbeyBkd"
-    "iEDPfUYd/x7H4c7/I9vG+o1VTqkC50cRRj70/b17KSa7qWFiNyi2LSr2EIZkyXCn"
-    "0q23KXB56jzaYyWf/Wi3MOxw+3WKt21gZ7IeyLnp2KhvAotnDU0mV3HaIPzBSlCN"
-    "sSi6"
+    "MIIEAzCCAuugAwIBAgIUBY1hlCGvdj4NhBXkZ/uLUZNILAwwDQYJKoZIhvcNAQEL"
+    "BQAwgZAxCzAJBgNVBAYTAkdCMRcwFQYDVQQIDA5Vbml0ZWQgS2luZ2RvbTEOMAwG"
+    "A1UEBwwFRGVyYnkxEjAQBgNVBAoMCU1vc3F1aXR0bzELMAkGA1UECwwCQ0ExFjAU"
+    "BgNVBAMMDW1vc3F1aXR0by5vcmcxHzAdBgkqhkiG9w0BCQEWEHJvZ2VyQGF0Y2hv"
+    "by5vcmcwHhcNMjAwNjA5MTEwNjM5WhcNMzAwNjA3MTEwNjM5WjCBkDELMAkGA1UE"
+    "BhMCR0IxFzAVBgNVBAgMDlVuaXRlZCBLaW5nZG9tMQ4wDAYDVQQHDAVEZXJieTES"
+    "MBAGA1UECgwJTW9zcXVpdHRvMQswCQYDVQQLDAJDQTEWMBQGA1UEAwwNbW9zcXVp"
+    "dHRvLm9yZzEfMB0GCSqGSIb3DQEJARYQcm9nZXJAYXRjaG9vLm9yZzCCASIwDQYJ"
+    "KoZIhvcNAQEBBQADggEPADCCAQoCggEBAME0HKmIzfTOwkKLT3THHe+ObdizamPg"
+    "UZmD64Tf3zJdNeYGYn4CEXbyP6fy3tWc8S2boW6dzrH8SdFf9uo320GJA9B7U1FW"
+    "Te3xda/Lm3JFfaHjkWw7jBwcauQZjpGINHapHRlpiCZsquAthOgxW9SgDgYlGzEA"
+    "s06pkEFiMw+qDfLo/sxFKB6vQlFekMeCymjLCbNwPJyqyhFmPWwio/PDMruBTzPH"
+    "3cioBnrJWKXc3OjXdLGFJOfj7pP0j/dr2LH72eSvv3PQQFl90CZPFhrCUcRHSSxo"
+    "E6yjGOdnz7f6PveLIB574kQORwt8ePn0yidrTC1ictikED3nHYhMUOUCAwEAAaNT"
+    "MFEwHQYDVR0OBBYEFPVV6xBUFPiGKDyo5V3+Hbh4N9YSMB8GA1UdIwQYMBaAFPVV"
+    "6xBUFPiGKDyo5V3+Hbh4N9YSMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEL"
+    "BQADggEBAGa9kS21N70ThM6/Hj9D7mbVxKLBjVWe2TPsGfbl3rEDfZ+OKRZ2j6AC"
+    "6r7jb4TZO3dzF2p6dgbrlU71Y/4K0TdzIjRj3cQ3KSm41JvUQ0hZ/c04iGDg/xWf"
+    "+pp58nfPAYwuerruPNWmlStWAXf0UTqRtg4hQDWBuUFDJTuWuuBvEXudz74eh/wK"
+    "sMwfu1HFvjy5Z0iMDU8PUDepjVolOCue9ashlS4EB5IECdSR2TItnAIiIwimx839"
+    "LdUdRudafMu5T5Xma182OC0/u/xRlEm+tvKGGmfFcN0piqVl8OrSPBgIlb+1IKJE"
+    "m/XriWr/Cq4h/JfB7NTsezVslgkBaoU="
     "-----END CERTIFICATE-----" };
 
 MqttClientContext mqttClientContext;
 
 osThreadId_t mqttTaskHandle;
 const osThreadAttr_t mqttTask_attributes =
-{ .name = "mqttTask", .stack_size = 1024 * 4, .priority = (osPriority_t) osPriorityNormal, };
-
+{ .name = "mqttTask", .stack_size = 2048 * 4, .priority = (osPriority_t) osPriorityNormal, };
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -126,20 +135,18 @@ const osThreadAttr_t defaultTask_attributes =
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-static MqttState_t handleStateInit(void);
-static MqttState_t handleStateDisconnected(void);
-static MqttState_t handleStateConnected(uint_t *prevButtonState);
 void mqttTestTask(void *argument);
-error_t mqttTestTlsInitCallback(MqttClientContext *context, TlsContext *tlsContext);
-void mqttTestPublishCallback(MqttClientContext *context, const char_t *topic, const uint8_t *message, size_t length, bool_t dup, MqttQosLevel qos,
-    bool_t retain, uint16_t packetId);
-error_t mqttTestConnect(void);
+
+static MqttState_t mqttInitialize(void);
+static MqttState_t mqttDisconnected(void);
+static MqttState_t mqttConnected(void);
+
+error_t mqttConnectBroker(void);
+error_t mqttClientTlsInitCallback(MqttClientContext *context, TlsContext *tlsContext);
+void mqttClientPublishCallback(MqttClientContext *context, const char_t *topic, const uint8_t *message, size_t length, bool_t dup, MqttQosLevel qos, bool_t retain, uint16_t packetId);
 /* USER CODE END FunctionPrototypes */
-
 void StartDefaultTask(void *argument);
-
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
-
 /* Hook prototypes */
 void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
 
@@ -173,34 +180,12 @@ void MX_FREERTOS_Init(void)
 
   /* USER CODE END Init */
 
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
-
   /* Create the thread(s) */
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+  /* creation of mqttTask */
   mqttTaskHandle = osThreadNew(mqttTestTask, NULL, &mqttTask_attributes);
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
 
 }
 
@@ -214,11 +199,22 @@ void MX_FREERTOS_Init(void)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
+  uint32_t lastLedToggleTick = 0;
+
   /* Infinite loop */
   for(;;)
   {
-    HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-    osDelay(500);
+    // 실제 제품에서는 불필요한 task 동작을 최소화 위해 interrupt 를 사용하도록 구현
+    g_btnState = (HAL_GPIO_ReadPin(USER_BTN_GPIO_Port, USER_BTN_Pin) == GPIO_PIN_SET);
+
+    uint32_t currentTick = osKernelGetTickCount();
+    if(currentTick - lastLedToggleTick >= LED_TOGGLE_INTERVAL_MS)
+    {
+      HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+      lastLedToggleTick = currentTick;
+    }
+
+    osDelay(DEFAULT_TASK_LOOP_DELAY_MS);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -226,26 +222,45 @@ void StartDefaultTask(void *argument)
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 
-/**
- * @brief Handles the one-time initialization state.
- * @return MqttState_t The next state to transition to (always DISCONNECTED).
- */
-static MqttState_t handleStateInit(void)
+void mqttTestTask(void *argument)
+{
+  MqttState_t mqttState = MQTT_STATE_INIT;
+
+  for(;;)
+  {
+    switch(mqttState)
+    {
+    case MQTT_STATE_INIT:
+      mqttState = mqttInitialize();
+      break;
+
+    case MQTT_STATE_DISCONNECTED:
+      mqttState = mqttDisconnected();
+      break;
+
+    case MQTT_STATE_CONNECTED:
+      mqttState = mqttConnected();
+      break;
+
+    default:
+      mqttState = MQTT_STATE_INIT;
+      break;
+    }
+  }
+}
+
+static MqttState_t mqttInitialize(void)
 {
   mqttClientInit(&mqttClientContext);
   TRACE_INFO("Start MQTT Task.\r\n");
   return MQTT_STATE_DISCONNECTED;
 }
 
-/**
- * @brief Handles the disconnected state, attempting to establish a connection.
- * @return MqttState_t The next state (CONNECTED on success, DISCONNECTED on failure).
- */
-static MqttState_t handleStateDisconnected(void)
+static MqttState_t mqttDisconnected(void)
 {
   if(netGetLinkState(&netInterface[0]))
   {
-    if(mqttTestConnect() == NO_ERROR)
+    if(mqttConnectBroker() == NO_ERROR)
     {
       TRACE_INFO("MQTT client connected.\r\n");
       return MQTT_STATE_CONNECTED;
@@ -259,44 +274,45 @@ static MqttState_t handleStateDisconnected(void)
   {
     osDelayTask(1000);
   }
-  // Stay in the disconnected state if connection fails or link is down
+
   return MQTT_STATE_DISCONNECTED;
 }
 
-/**
- * @brief Handles the connected state, processing MQTT logic and monitoring the connection.
- * @param[in,out] prevButtonState Pointer to the previous button state for change detection.
- * @return MqttState_t The next state (DISCONNECTED on error, CONNECTED otherwise).
- */
-static MqttState_t handleStateConnected(uint_t *prevButtonState)
+static MqttState_t mqttConnected()
 {
-  error_t error = NO_ERROR;
-  uint_t buttonState;
+  error_t err = NO_ERROR;
   char_t buffer[16];
+  static uint8_t lastPublishedState = 0;
 
-  do
+  if(lastPublishedState != g_btnState)
   {
-    buttonState = (HAL_GPIO_ReadPin(USER_BTN_GPIO_Port, USER_BTN_Pin) == GPIO_PIN_SET);
-    if(buttonState != *prevButtonState)
+    snprintf(buffer, sizeof(buffer), "%s", g_btnState ? MQTT_PAYLOAD_PRESSED : MQTT_PAYLOAD_RELEASED);
+
+    err = mqttClientPublish(&mqttClientContext, MQTT_TOPIC_BUTTON, buffer, strlen(buffer), MQTT_QOS_LEVEL_1, TRUE, NULL);
+    if(err != NO_ERROR)
     {
-      strcpy(buffer, buttonState ? "pressed" : "released");
-
-      if((error = mqttClientPublish(&mqttClientContext, "board/buttons/1", buffer, strlen(buffer), MQTT_QOS_LEVEL_1, TRUE, NULL)) != NO_ERROR)
-      {
-        TRACE_INFO("mqttClientPublish() failed: %d\r\n", error);
-        break;
-      }
-      *prevButtonState = buttonState;
+      TRACE_INFO("mqttClientPublish() failed: %d\r\n", err);
     }
-
-    if((error = mqttClientTask(&mqttClientContext, 100)) != NO_ERROR)
+    else
     {
-      TRACE_INFO("mqttClientTask() failed or disconnected: %d\r\n", error);
-      break;
+      lastPublishedState = g_btnState;
     }
-  }while(0);
+  }
 
-  if(error != NO_ERROR)
+  if(err == NO_ERROR)
+  {
+    err = mqttClientTask(&mqttClientContext, 100);
+    if(err != NO_ERROR && err != ERROR_TIMEOUT)
+    {
+      TRACE_INFO("mqttClientTask() failed or disconnected: %d\r\n", err);
+    }
+    else
+    {
+      err = NO_ERROR;
+    }
+  }
+
+  if(err != NO_ERROR)
   {
     TRACE_INFO("Connection lost. Reconnecting...\r\n");
     mqttClientClose(&mqttClientContext);
@@ -304,237 +320,148 @@ static MqttState_t handleStateConnected(uint_t *prevButtonState)
     return MQTT_STATE_DISCONNECTED;
   }
 
-  // Stay in the connected state if everything is OK
   return MQTT_STATE_CONNECTED;
 }
 
-/**
- * @brief Main task for the MQTT client, implemented as a state machine dispatcher.
- * @details This task runs an infinite loop that calls a handler function
- * based on the current state and transitions to the next state returned by the handler.
- * @param[in] argument The argument passed when the task is created (unused).
- */
-void mqttTestTask(void *argument)
+error_t mqttClientTlsInitCallback(MqttClientContext *context, TlsContext *tlsContext)
 {
-  MqttState_t currentState = MQTT_STATE_INIT;
-  uint_t prevButtonState = 0;
-
-  for(;;)
-  {
-    switch(currentState)
-    {
-    case MQTT_STATE_INIT:
-      currentState = handleStateInit();
-      break;
-
-    case MQTT_STATE_DISCONNECTED:
-      currentState = handleStateDisconnected();
-      // Upon successful connection, reset the button state
-      if(currentState == MQTT_STATE_CONNECTED)
-      {
-        prevButtonState = (HAL_GPIO_ReadPin(USER_BTN_GPIO_Port, USER_BTN_Pin) == GPIO_PIN_SET);
-      }
-      break;
-
-    case MQTT_STATE_CONNECTED:
-      currentState = handleStateConnected(&prevButtonState);
-      break;
-
-    default:
-      // Should not happen, but as a safeguard, reset to INIT state.
-      currentState = MQTT_STATE_INIT;
-      break;
-    }
-  }
-}
-
-/**
- * @brief Callback function for initializing TLS communication for the MQTT client.
- * @details Sets up the Pseudo-Random Number Generator (PRNG), Server Name
- * Indication (SNI), client certificate, and trusted CA list for the TLS context.
- * @param[in] context Pointer to the MQTT client context.
- * @param[in] tlsContext Pointer to the TLS context to be initialized.
- * @return error_t Returns NO_ERROR on success, or an error code on failure.
- */
-error_t mqttTestTlsInitCallback(MqttClientContext *context, TlsContext *tlsContext)
-{
-  error_t error;
+  error_t err;
 
   TRACE_INFO("MQTT Client: TLS initialization callback\r\n");
 
-  do
+  err = tlsSetPrng(tlsContext, HMAC_DRBG_PRNG_ALGO, &hmacDrbgContext);
+  if(err)
   {
-    if((error = tlsSetPrng(tlsContext, HMAC_DRBG_PRNG_ALGO, &hmacDrbgContext)) != NO_ERROR)
-      break;
+    return err;
+  }
 
-    if((error = tlsSetServerName(tlsContext, APP_SERVER_NAME)) != NO_ERROR)
-      break;
-
-#if (APP_SERVER_PORT == 8884)
-    if((error = tlsLoadCertificate(tlsContext, 0, clientCert, strlen(clientCert), clientKey, strlen(clientKey), NULL)) != NO_ERROR)
-      break;
+#if (APP_SET_CIPHER_SUITES == ENABLED)
+  err = tlsSetCipherSuites(tlsContext, cipherSuites, arraysize(cipherSuites));
+  if(err)
+  {
+    return err;
+  }
 #endif
 
-    if((error = tlsSetTrustedCaList(tlsContext, trustedCaList, strlen(trustedCaList))) != NO_ERROR)
-      break;
+#if (APP_SET_SERVER_NAME == ENABLED)
+  err = tlsSetServerName(tlsContext, APP_SERVER_NAME);
+  if(err)
+  {
+    return err;
+  }
+#endif
 
-  }while(0);
+#if (APP_SET_TRUSTED_CA_LIST == ENABLED)
+  err = tlsSetTrustedCaList(tlsContext, trustedCaList, strlen(trustedCaList));
+  if(err)
+  {
+    return err;
+  }
+#endif
 
-  return error;
+  return NO_ERROR;
 }
 
-/**
- * @brief Callback function invoked upon receiving an MQTT PUBLISH packet.
- * @details Defines the logic for handling messages received from the server on
- * specific topics. It controls an LED based on the received topic and message payload.
- * @param[in] context Pointer to the MQTT client context.
- * @param[in] topic The topic string on which the message was received.
- * @param[in] message Pointer to the received message data.
- * @param[in] length The length of the received message.
- * @param[in] dup The DUP (duplicate) flag.
- * @param[in] qos The Quality of Service (QoS) level.
- * @param[in] retain The Retain flag.
- * @param[in] packetId The packet identifier.
- */
-void mqttTestPublishCallback(MqttClientContext *context, const char_t *topic, const uint8_t *message, size_t length, bool_t dup, MqttQosLevel qos,
+void mqttClientPublishCallback(MqttClientContext *context, const char_t *topic, const uint8_t *message, size_t length, bool_t dup, MqttQosLevel qos,
     bool_t retain, uint16_t packetId)
 {
-  static const char *MQTT_TOPIC_LED_3 = "board/leds/3";
-  static const char *MQTT_CMD_TOGGLE = "toggle";
-  static const char *MQTT_CMD_ON = "on";
-
   TRACE_INFO("PUBLISH packet received...\r\n");
-  TRACE_INFO("  Topic: %s\r\n", topic);
-  TRACE_INFO("  Message (%" PRIuSIZE " bytes):\r\n", length);
-  TRACE_INFO_ARRAY("    ", message, length);
+  TRACE_INFO("Topic: %s\r\n", topic);
+  TRACE_INFO("Message (%" PRIuSIZE " bytes): ", length);
+  TRACE_INFO("%.*s\r\n", length, message);
+  TRACE_INFO_ARRAY("", message, length);
 
   if(!strcmp(topic, MQTT_TOPIC_LED_3))
   {
-    if(length == strlen(MQTT_CMD_TOGGLE) && !strncasecmp((char_t*) message, MQTT_CMD_TOGGLE, length))
+    if(length == strlen(MQTT_PAYLOAD_TOGGLE) && !strncasecmp((char_t*) message, MQTT_PAYLOAD_TOGGLE, length))
     {
       HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
     }
-    else if(length == strlen(MQTT_CMD_ON) && !strncasecmp((char_t*) message, MQTT_CMD_ON, length))
+    else if(length == strlen(MQTT_PAYLOAD_ON) && !strncasecmp((char_t*) message, MQTT_PAYLOAD_ON, length))
     {
-      HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET); // Active Low LED ON
+      HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
     }
     else
     {
-      HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET); // Active Low LED OFF
+      HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET);
     }
   }
 }
 
-/**
- * @brief Establishes a connection to the MQTT server and performs initial setup.
- * @details Resolves the server name, sets the MQTT protocol version, registers
- * callbacks, sets the Will message, then connects to the server, subscribes to
- * a topic, and publishes an "online" status message.
- * @return error_t Returns NO_ERROR on success, or an error code on failure.
- */
-error_t mqttTestConnect(void)
+error_t mqttConnectBroker(void)
 {
-  error_t error;
+  error_t err;
   IpAddr ipAddr;
 
   do
   {
     TRACE_INFO("\r\n\r\nResolving server name...\r\n");
-    if((error = getHostByName(NULL, APP_SERVER_NAME, &ipAddr, 0)) != NO_ERROR)
+    if((err = getHostByName(NULL, APP_SERVER_NAME, &ipAddr, 0)) != NO_ERROR)
     {
-      TRACE_INFO("getHostByName() failed: %d\r\n", error);
+      TRACE_INFO("getHostByName() failed: %d\r\n", err);
       break;
     }
 
-    if((error = mqttClientSetVersion(&mqttClientContext, MQTT_VERSION_3_1_1)) != NO_ERROR)
+    if((err = mqttClientSetVersion(&mqttClientContext, MQTT_VERSION_3_1_1)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientSetVersion() failed: %d\r\n", error);
       break;
     }
-
-#if (APP_SERVER_PORT == 1883)
-    mqttClientSetTransportProtocol(&mqttClientContext, MQTT_TRANSPORT_PROTOCOL_TCP);
-#elif (APP_SERVER_PORT == 8883 || APP_SERVER_PORT == 8884)
-    mqttClientSetTransportProtocol(&mqttClientContext, MQTT_TRANSPORT_PROTOCOL_TLS);
-
-    if((error = mqttClientRegisterTlsInitCallback(&mqttClientContext, mqttTestTlsInitCallback)) != NO_ERROR)
+    if((err = mqttClientSetTransportProtocol(&mqttClientContext, MQTT_TRANSPORT_PROTOCOL_TLS)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientRegisterTlsInitCallback() failed: %d\r\n", error);
       break;
     }
-#endif
-
-    if((error = mqttClientRegisterPublishCallback(&mqttClientContext, mqttTestPublishCallback)) != NO_ERROR)
+    if((err = mqttClientRegisterTlsInitCallback(&mqttClientContext, mqttClientTlsInitCallback)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientRegisterPublishCallback() failed: %d\r\n", error);
       break;
     }
-
-    if((error = mqttClientSetTimeout(&mqttClientContext, 20000)) != NO_ERROR)
+    if((err = mqttClientRegisterPublishCallback(&mqttClientContext, mqttClientPublishCallback)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientSetTimeout() failed: %d\r\n", error);
       break;
     }
-
-    if((error = mqttClientSetKeepAlive(&mqttClientContext, 30)) != NO_ERROR)
+    if((err = mqttClientSetTimeout(&mqttClientContext, 20000)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientSetKeepAlive() failed: %d\r\n", error);
       break;
     }
-
-    if((error = mqttClientSetWillMessage(&mqttClientContext, "board/status", "offline", 7, MQTT_QOS_LEVEL_0, FALSE)) != NO_ERROR)
+    if((err = mqttClientSetKeepAlive(&mqttClientContext, 30)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientSetWillMessage() failed: %d\r\n", error);
+      break;
+    }
+    if((err = mqttClientSetWillMessage(&mqttClientContext, MQTT_TOPIC_STATUS, MQTT_PAYLOAD_OFFLINE, strlen(MQTT_PAYLOAD_OFFLINE), MQTT_QOS_LEVEL_0, FALSE)) != NO_ERROR)
+    {
       break;
     }
 
     TRACE_INFO("Connecting to MQTT server %s...\r\n", ipAddrToString(&ipAddr, NULL));
-    if((error = mqttClientConnect(&mqttClientContext, &ipAddr, APP_SERVER_PORT, TRUE)) != NO_ERROR)
+    if((err = mqttClientConnect(&mqttClientContext, &ipAddr, APP_SERVER_PORT, TRUE)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientConnect() failed: %d\r\n", error);
+      TRACE_INFO("mqttClientConnect() failed: %d\r\n", err);
       mqttClientClose(&mqttClientContext);
       break;
     }
 
-    if((error = mqttClientSubscribe(&mqttClientContext, "board/leds/+", MQTT_QOS_LEVEL_1, NULL)) != NO_ERROR)
+    if((err = mqttClientSubscribe(&mqttClientContext, MQTT_TOPIC_LEDS_WILD, MQTT_QOS_LEVEL_1, NULL)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientSubscribe() failed: %d\r\n", error);
       mqttClientClose(&mqttClientContext);
       break;
     }
 
-    if((error = mqttClientPublish(&mqttClientContext, "board/status", "online", 6, MQTT_QOS_LEVEL_1, TRUE, NULL)) != NO_ERROR)
+    if((err = mqttClientPublish(&mqttClientContext, MQTT_TOPIC_STATUS, MQTT_PAYLOAD_ONLINE, strlen(MQTT_PAYLOAD_ONLINE), MQTT_QOS_LEVEL_1, TRUE, NULL)) != NO_ERROR)
     {
-      TRACE_INFO("mqttClientPublish() failed: %d\r\n", error);
       mqttClientClose(&mqttClientContext);
       break;
     }
 
   }while(0);
 
-  return error;
+  return err;
 }
 
-/**
- * @brief Outputs a single character to the UART.
- * @details Redirects standard I/O functions like `printf` to the debug UART.
- * (Part of the `_write` implementation often auto-generated by STM32 CubeIDE).
- * @param[in] ch The character to be transmitted.
- * @return int The transmitted character.
- */
 int __io_putchar(int ch)
 {
   HAL_UART_Transmit(&huart1, (uint8_t*) &ch, 1, HAL_MAX_DELAY);
   return ch;
 }
 
-/**
- * @brief Debug function to display the contents of a data array in hexadecimal format.
- * @param[in] stream The output file stream (e.g., stdout).
- * @param[in] prepend The string to prepend to the beginning of each line.
- * @param[in] data Pointer to the data array to be displayed.
- * @param[in] length The number of bytes to display.
- */
 void debugDisplayArray(FILE *stream, const char_t *prepend, const void *data, size_t length)
 {
   for(size_t i = 0;i < length;i++)
@@ -550,4 +477,3 @@ void debugDisplayArray(FILE *stream, const char_t *prepend, const void *data, si
 }
 
 /* USER CODE END Application */
-
