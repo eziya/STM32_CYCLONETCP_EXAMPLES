@@ -263,9 +263,9 @@ Error_Handler();
   /* USER CODE BEGIN 2 */
   /* Start-up message */
   TRACE_INFO("\r\n");
-  TRACE_INFO("***********************************\r\n");
-  TRACE_INFO("*** CycloneTCP HTTPS Client Demo ***\r\n");
-  TRACE_INFO("***********************************\r\n");
+  TRACE_INFO("***************************************\r\n");
+  TRACE_INFO("*** CycloneTCP MQTT/TLS Client Demo ***\r\n");
+  TRACE_INFO("***************************************\r\n");
   TRACE_INFO("Target: STM32H747I-DISCO\r\n");
   TRACE_INFO("\r\n");
 
