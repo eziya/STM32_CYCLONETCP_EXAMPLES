@@ -282,7 +282,7 @@
 // <4=>Info
 // <5=>Debug
 // <6=>Verbose
-#define BSD_SOCKET_TRACE_LEVEL 0
+#define BSD_SOCKET_TRACE_LEVEL 4
 
 // <o>WebSocket Trace level
 // <i>Set the desired debugging level
@@ -761,7 +761,7 @@
 // <q>BSD socket support
 // <i>Enable BSD socket support
 // <i>Default: Disabled
-#define BSD_SOCKET_SUPPORT 0
+#define BSD_SOCKET_SUPPORT 1
 
 // <q>Raw socket support
 // <i>Enable raw socket support
