@@ -71,6 +71,13 @@ ModbusServerSettings modbusServerSettings;
 ModbusServerContext modbusServerContext;
 TlsCache *tlsCache;
 
+/* Runtime configuration for Modbus server mode:
+ * 0 = Plain Modbus/TCP server (no TLS)
+ * 1 = Secure Modbus/TCP server (with TLS)
+ * This can be easily extended to read from EEPROM/FRAM in the future
+ */
+uint8_t is_secure_modbus = 0;
+
 uint16_t modbusData[100];
 SemaphoreHandle_t modbusDataMutex;
 
@@ -203,6 +210,10 @@ void StartDefaultTask(void *argument)
 void ModbusServerTask(void *argument)
 {
   uint32_t startTime = osKernelGetTickCount();
+  
+  /* Display selected Modbus server mode */
+  TRACE_INFO("Modbus server mode: %s\r\n", (is_secure_modbus == 1) ? "Secure (TLS)" : "Plain TCP");
+  
   TRACE_INFO("Waiting for DHCP to complete...\r\n");
 
   while(dhcpClientContext.state != DHCP_STATE_BOUND)
@@ -238,12 +249,21 @@ void ModbusServerTask(void *argument)
     TRACE_INFO("DHCP DNS Server:  %s\r\n", ipv4AddrToString(ipAddr, ipStr));
   }
 
-  /* Initialize TLS session cache */
-  tlsCache = tlsInitCache(8);
-  if(tlsCache == NULL)
+  /* Initialize TLS session cache only if secure mode is enabled */
+  if(is_secure_modbus == 1)
   {
-    TRACE_ERROR("Failed to initialize TLS session cache!\r\n");
-    osThreadTerminate(NULL);
+    tlsCache = tlsInitCache(8);
+    if(tlsCache == NULL)
+    {
+      TRACE_ERROR("Failed to initialize TLS session cache!\r\n");
+      osThreadTerminate(NULL);
+    }
+    TRACE_INFO("TLS session cache initialized for secure Modbus operation\r\n");
+  }
+  else
+  {
+    tlsCache = NULL;
+    TRACE_INFO("TLS session cache skipped for plain Modbus operation\r\n");
   }
 
   /* Initialize data array */
@@ -282,7 +302,17 @@ error_t InitModbusServer(void)
 
   /* Register callback functions */
   modbusServerSettings.openCallback = modbusServerOpenCallback;
-  modbusServerSettings.tlsInitCallback = modbusServerTlsInitCallback;
+  
+  /* Conditionally set TLS callback based on runtime configuration */
+  if(is_secure_modbus == 1)
+  {
+    modbusServerSettings.tlsInitCallback = modbusServerTlsInitCallback;
+  }
+  else
+  {
+    modbusServerSettings.tlsInitCallback = NULL;
+  }
+  
   modbusServerSettings.lockCallback = modbusServerLockCallback;
   modbusServerSettings.unlockCallback = modbusServerUnlockCallback;
   modbusServerSettings.readCoilCallback = modbusServerReadCoilCallback;
@@ -306,7 +336,16 @@ error_t InitModbusServer(void)
     return error;
   }
 
-  TRACE_INFO("Secure Modbus/TCP server started on port %u\r\n", APP_MODBUS_SERVER_PORT);
+  /* Display startup message based on current mode */
+  if(is_secure_modbus == 1)
+  {
+    TRACE_INFO("Secure Modbus/TCP server started on port %u\r\n", APP_MODBUS_SERVER_PORT);
+  }
+  else
+  {
+    TRACE_INFO("Plain Modbus/TCP server started on port %u\r\n", APP_MODBUS_SERVER_PORT);
+  }
+  
   return NO_ERROR;
 }
 
