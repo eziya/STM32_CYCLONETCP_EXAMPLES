@@ -26,6 +26,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+/* [IMPORTANT] Use Optimization O1 or higher for release */
+
 #include "core/net.h"
 #include "dhcp/dhcp_client.h"
 #include "modbus/modbus_server.h"
@@ -42,13 +45,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define APP_MODBUS_SERVER_PORT 802
+#define APP_MODBUS_SERVER_PORT 502
+#define APP_MODBUS_SERVER_SECURE_PORT 802
 #define APP_MODBUS_SERVER_TIMEOUT 600000
 #define APP_MODBUS_SERVER_KEEP_ALIVE_IDLE 10000
 #define APP_MODBUS_SERVER_KEEP_ALIVE_INTERVAL 5000
 #define APP_MODBUS_SERVER_KEEP_ALIVE_PROBES 4
 
 #define DHCP_TIMEOUT_MS 10000
+#define MUTEX_TIMEOUT_MS 1000
 
 /* certificates resources */
 #define APP_MODBUS_SERVER_CERT "certs/server_cert.pem"
@@ -76,7 +81,7 @@ TlsCache *tlsCache;
  * 1 = Secure Modbus/TCP server (with TLS)
  * This can be easily extended to read from EEPROM/FRAM in the future
  */
-uint8_t is_secure_modbus = 0;
+uint8_t is_secure_modbus = 1;
 
 uint16_t modbusData[100];
 SemaphoreHandle_t modbusDataMutex;
@@ -229,7 +234,7 @@ void ModbusServerTask(void *argument)
   /* Print IP, Gateway, DNS address */
   NetInterface *interface = &netInterface[0];
   Ipv4Addr ipAddr;
-  char ipStr[14];
+  char ipStr[16];
 
   ipAddr = interface->ipv4Context.addrList[0].addr;
   if(ipAddr != IPV4_UNSPECIFIED_ADDR)
@@ -297,7 +302,7 @@ error_t InitModbusServer(void)
   modbusServerGetDefaultSettings(&modbusServerSettings);
   modbusServerSettings.unitId = 1;
   modbusServerSettings.interface = &netInterface[0];
-  modbusServerSettings.port = APP_MODBUS_SERVER_PORT;
+  modbusServerSettings.port = (is_secure_modbus? APP_MODBUS_SERVER_SECURE_PORT : APP_MODBUS_SERVER_PORT);
   modbusServerSettings.timeout = APP_MODBUS_SERVER_TIMEOUT;
 
   /* Register callback functions */
@@ -339,7 +344,7 @@ error_t InitModbusServer(void)
   /* Display startup message based on current mode */
   if(is_secure_modbus == 1)
   {
-    TRACE_INFO("Secure Modbus/TCP server started on port %u\r\n", APP_MODBUS_SERVER_PORT);
+    TRACE_INFO("Secure Modbus/TCP server started on port %u\r\n", APP_MODBUS_SERVER_SECURE_PORT);
   }
   else
   {
@@ -462,7 +467,10 @@ error_t modbusServerOpenCallback(ModbusClientConnection *connection, IpAddr clie
  **/
 void modbusServerLockCallback(ModbusClientConnection *connection)
 {
-  xSemaphoreTake(modbusDataMutex, portMAX_DELAY);
+  if(xSemaphoreTake(modbusDataMutex, pdMS_TO_TICKS(MUTEX_TIMEOUT_MS)) != pdTRUE)
+  {
+    TRACE_ERROR("Failed to take modbusDataMutex in lock callback!\r\n");
+  }
 }
 
 /**

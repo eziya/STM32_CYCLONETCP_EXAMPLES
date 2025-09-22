@@ -45,6 +45,7 @@
 #define APP_MODBUS_SERVER_KEEP_ALIVE_PROBES 4
 
 #define DHCP_TIMEOUT_MS 10000
+#define MUTEX_TIMEOUT_MS 1000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -207,7 +208,7 @@ void ModbusServerTask(void *argument)
   /* Print IP, Gateway, DNS address */
   NetInterface *interface = &netInterface[0];
   Ipv4Addr ipAddr;
-  char ipStr[14];
+  char ipStr[16];
 
   ipAddr = interface->ipv4Context.addrList[0].addr;
   if(ipAddr != IPV4_UNSPECIFIED_ADDR)
@@ -321,7 +322,10 @@ error_t modbusServerOpenCallback(ModbusClientConnection *connection, IpAddr clie
  **/
 void modbusServerLockCallback(ModbusClientConnection *connection)
 {
-  xSemaphoreTake(modbusDataMutex, portMAX_DELAY);
+  if(xSemaphoreTake(modbusDataMutex, pdMS_TO_TICKS(MUTEX_TIMEOUT_MS)) != pdTRUE)
+  {
+    TRACE_ERROR("Failed to take modbusDataMutex in lock callback!\r\n");
+  }
 }
 
 /**

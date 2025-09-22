@@ -7,19 +7,19 @@
 		<item value="APP_IPV4_PRIMARY_DNS"/>
 	</list>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="APP_MODBUS_SERVER_TIMEOUT"/>
+		<item key="selection" value="APP_MODBUS_SERVER_PORT"/>
 		<item key="casesensitive" value="true"/>
 		<item key="wholeword" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="MODBUS_SERVER_STACK_SIZE"/>
+			<item value="Modbus/TCP Serv"/>
+			<item value="APP_MODBUS_SERVER_PORT"/>
 			<item value="APP_MODBUS_SERVER_TIMEOUT"/>
 			<item value="APP_MODBUS_SERVER_CERT"/>
 			<item value="BSD"/>
 			<item value="LD1"/>
 			<item value="mqttTestPublishCallback"/>
-			<item value="MQTT_TOPIC_LED_3"/>
-			<item value="mqttConnected"/>
-			<item value="error"/>
 		</list>
 		<list key="replacehistory">
 			<item value="LED1"/>
