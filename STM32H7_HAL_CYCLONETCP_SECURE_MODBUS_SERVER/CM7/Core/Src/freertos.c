@@ -33,6 +33,18 @@
 #include "tls.h"
 #include "rng/hmac_drbg.h"
 #include "resource_manager.h"
+
+/*
+ * Runtime Modbus Server Configuration:
+ * This implementation supports runtime selection between secure (TLS) and plain Modbus server.
+ * The configuration is controlled by the is_secure_modbus variable.
+ *
+ * Future extensibility:
+ * - is_secure_modbus can be read from EEPROM/FRAM for persistent configuration
+ * - Additional configuration parameters can be added (e.g., port, timeout, auth mode)
+ * - Runtime switching can be implemented via Modbus commands or web interface
+ * - Configuration validation and fallback mechanisms can be added
+ */
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -70,6 +82,11 @@ extern HmacDrbgContext hmacDrbgContext;
 ModbusServerSettings modbusServerSettings;
 ModbusServerContext modbusServerContext;
 TlsCache *tlsCache;
+
+/* Runtime configuration for secure/plain Modbus server selection
+ * 1 = Secure Modbus (TLS enabled), 0 = Plain Modbus (TLS disabled)
+ * This can be extended in the future to read from EEPROM/FRAM for persistent configuration */
+uint8_t is_secure_modbus = 1; // Default to secure mode
 
 uint16_t modbusData[100];
 SemaphoreHandle_t modbusDataMutex;
@@ -238,12 +255,20 @@ void ModbusServerTask(void *argument)
     TRACE_INFO("DHCP DNS Server:  %s\r\n", ipv4AddrToString(ipAddr, ipStr));
   }
 
-  /* Initialize TLS session cache */
-  tlsCache = tlsInitCache(8);
-  if(tlsCache == NULL)
+  /* Initialize TLS session cache only if secure mode is enabled */
+  if(is_secure_modbus)
   {
-    TRACE_ERROR("Failed to initialize TLS session cache!\r\n");
-    osThreadTerminate(NULL);
+    tlsCache = tlsInitCache(8);
+    if(tlsCache == NULL)
+    {
+      TRACE_ERROR("Failed to initialize TLS session cache!\r\n");
+      osThreadTerminate(NULL);
+    }
+  }
+  else
+  {
+    tlsCache = NULL;
+    TRACE_INFO("Running in plain Modbus mode (TLS disabled)\r\n");
   }
 
   /* Initialize data array */
@@ -268,6 +293,7 @@ void ModbusServerTask(void *argument)
 
 /**
  * @brief Initialize modbus server
+ * Runtime selection between secure (TLS) and plain Modbus server based on is_secure_modbus variable
  **/
 error_t InitModbusServer(void)
 {
@@ -280,9 +306,9 @@ error_t InitModbusServer(void)
   modbusServerSettings.port = APP_MODBUS_SERVER_PORT;
   modbusServerSettings.timeout = APP_MODBUS_SERVER_TIMEOUT;
 
-  /* Register callback functions */
+  /* Register callback functions - using ternary operators for clarity and consistency */
   modbusServerSettings.openCallback = modbusServerOpenCallback;
-  modbusServerSettings.tlsInitCallback = modbusServerTlsInitCallback;
+  modbusServerSettings.tlsInitCallback = is_secure_modbus ? modbusServerTlsInitCallback : NULL;
   modbusServerSettings.lockCallback = modbusServerLockCallback;
   modbusServerSettings.unlockCallback = modbusServerUnlockCallback;
   modbusServerSettings.readCoilCallback = modbusServerReadCoilCallback;
@@ -306,12 +332,14 @@ error_t InitModbusServer(void)
     return error;
   }
 
-  TRACE_INFO("Secure Modbus/TCP server started on port %u\r\n", APP_MODBUS_SERVER_PORT);
+  /* Log server start message based on mode */
+  TRACE_INFO("%s Modbus/TCP server started on port %u\r\n", 
+             is_secure_modbus ? "Secure" : "Plain", APP_MODBUS_SERVER_PORT);
   return NO_ERROR;
 }
 
 /**
- * @brief TLS initialization callback
+ * @brief TLS initialization callback (only called when is_secure_modbus = 1)
  **/
 error_t modbusServerTlsInitCallback(ModbusClientConnection *connection, TlsContext *tlsContext)
 {
@@ -322,6 +350,13 @@ error_t modbusServerTlsInitCallback(ModbusClientConnection *connection, TlsConte
   size_t serverKeyLen;
   const char_t *caList;
   size_t caListLen;
+
+  /* Defensive check - this callback should only be set when is_secure_modbus = 1 */
+  if(!is_secure_modbus)
+  {
+    TRACE_ERROR("TLS callback called in plain mode - configuration error!\r\n");
+    return ERROR_INVALID_STATE;
+  }
 
   TRACE_INFO("Secure Modbus/TCP Server: Configuring TLS...\r\n");
 
