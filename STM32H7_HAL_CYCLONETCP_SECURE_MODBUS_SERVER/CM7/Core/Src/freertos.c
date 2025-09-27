@@ -94,6 +94,14 @@ const osThreadAttr_t modbusTask_attributes =
     .priority = (osPriority_t) osPriorityNormal,
 };
 
+osThreadId_t monitorTaskHandle;
+const osThreadAttr_t monitorTask_attributes =
+{
+    .name = "monitorTask",
+    .stack_size = 512 * 4,
+    .priority = (osPriority_t) osPriorityLow,
+};
+
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -105,6 +113,8 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+void MonitorTask(void *argument);
+
 void ModbusServerTask(void *argument);
 error_t InitModbusServer(void);
 
@@ -179,6 +189,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   modbusTaskHandle = osThreadNew(ModbusServerTask, NULL, &modbusTask_attributes);
+  monitorTaskHandle = osThreadNew(MonitorTask, NULL, &monitorTask_attributes);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -208,6 +219,46 @@ void StartDefaultTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+/**
+ * @brief freertos monitoring task procedure
+ * Displays stack usage and heap usage every minute.
+ **/
+void MonitorTask(void *argument)
+{
+  UBaseType_t uxHighWaterMark;
+  UBaseType_t uxTotalHeapSize = configTOTAL_HEAP_SIZE;
+  UBaseType_t uxFreeHeapSize;
+
+  TRACE_INFO("Monitor Task started, reporting every 60 seconds...\r\n");
+
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(60000);
+
+    TRACE_INFO("\r\n--- FreeRTOS Memory Status Report ---\r\n");
+
+    uxFreeHeapSize = xPortGetFreeHeapSize();
+
+    TRACE_INFO("Heap Total Size: %lu bytes\r\n", uxTotalHeapSize);
+    TRACE_INFO("Heap Free Size : %lu bytes\r\n", uxFreeHeapSize);
+    TRACE_INFO("Heap Used Size : %lu bytes\r\n", uxTotalHeapSize - uxFreeHeapSize);
+
+
+    TRACE_INFO("\r\n--- Task Stack Usage (Min. Free Stack) ---\r\n");
+    uxHighWaterMark = uxTaskGetStackHighWaterMark(defaultTaskHandle);
+    TRACE_INFO("defaultTask     : %lu words (%lu bytes) free\r\n", uxHighWaterMark, uxHighWaterMark * sizeof(StackType_t));
+
+    uxHighWaterMark = uxTaskGetStackHighWaterMark(modbusTaskHandle);
+    TRACE_INFO("modbusTask      : %lu words (%lu bytes) free\r\n", uxHighWaterMark, uxHighWaterMark * sizeof(StackType_t));
+
+    uxHighWaterMark = uxTaskGetStackHighWaterMark(monitorTaskHandle);
+    TRACE_INFO("monitorTask     : %lu words (%lu bytes) free\r\n", uxHighWaterMark, uxHighWaterMark * sizeof(StackType_t));
+
+    TRACE_INFO("-----------------------------------------\r\n");
+  }
+}
 
 /**
  * @brief freertos modbus task procedure
