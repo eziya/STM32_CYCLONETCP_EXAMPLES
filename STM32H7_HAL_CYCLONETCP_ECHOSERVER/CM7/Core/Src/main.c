@@ -39,7 +39,7 @@
 /* DUAL_CORE_BOOT_SYNC_SEQUENCE: Define for dual core boot synchronization    */
 /*                             demonstration code based on hardware semaphore */
 /* This define is present in both CM7/CM4 projects                            */
-/* To comment when developping/debugging on a single core                     */
+/* To comment when developing/debugging on a single core                     */
 #define DUAL_CORE_BOOT_SYNC_SEQUENCE
 
 #if defined(DUAL_CORE_BOOT_SYNC_SEQUENCE)
@@ -94,7 +94,7 @@ int main(void)
   /* Wait until CPU2 boots and enters in stop mode or timeout*/
   timeout = 0xFFFF;
   while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
-  if ( timeout < 0 )
+  if ( timeout <= 0 )
   {
     Error_Handler();
   }
@@ -124,7 +124,7 @@ HSEM notification */
   /* wait until CPU2 wakes up from stop mode */
   timeout = 0xFFFF;
   while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
-  if ( timeout < 0 )
+  if ( timeout <= 0 )
   {
     Error_Handler();
   }
